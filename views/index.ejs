@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>
+        <%= siteName %>
+    </title>
+    <link rel="stylesheet" type="text/css"
+        href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" />
+    <link href="/css/style.css" rel="stylesheet" />
+    <link href="/css/responsive.css" rel="stylesheet" />
+</head>
+
+<body>
+    <%- include('partials/header', { page: 'home' }) %>
+        <section class="slider_section ">
+            <div class="container ">
+                <div class="row">
+                    <div class="col-md-6 ">
+                        <div class="detail-box">
+                            <h1>Repair and <br>Maintenance <br>Services</h1>
+                            <p>
+                                <%= content.slider %>
+                            </p>
+
+
+                            <a href="/contact">Contact Us</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="img-box">
+                            <img src="/images/slider-img.png" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        </div>
+
+        <section class="feature_section">
+            <div class="container">
+                <div class="feature_container">
+                    <% features.forEach(feature=> { %>
+                        <div class="box <%= feature.active ? 'active' : '' %>">
+                            <div class="img-box">
+                                <a href="/booking">
+                                    <%- feature.svg %>
+                            </div>
+                            <h5 class="name">
+                                <%= feature.name %>
+                            </h5>
+                        </div>
+                        <% }); %>
+                </div>
+            </div>
+        </section>
+
+        <section class="about_section layout_padding-bottom">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-5 col-md-6">
+                        <div class="detail-box">
+                            <h2>About Us</h2>
+                            <p>
+                                <%= content.about %>
+                            </p>
+                            <a href="/about">Read More</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-7 col-md-6">
+                        <div class="img-box">
+                            <img src="/images/about-img.jpg" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="professional_section layout_padding">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="img-box">
+                            <img src="/images/professional-img.png" alt="">
+                        </div>
+                    </div>
+                    <div class="col-md-6 ">
+                        <div class="detail-box">
+                            <h2>We Provide Professional <br>Home Services</h2>
+                            <p>
+                                <%= content.professional %>
+                            </p>
+                            <a href="/service">Read More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="service_section layout_padding">
+            <div class="container ">
+                <div class="heading_container heading_center">
+                    <h2>Our Services</h2>
+                </div>
+                <div class="row">
+                    <% services.forEach(service=> { %>
+                        <div class="col-sm-6 col-md-4 mx-auto">
+                            <div class="box ">
+                                <div class="img-box">
+                                    <img src="<%= service.img %>" alt="" />
+                                </div>
+                                <div class="detail-box">
+                                    <h5>
+                                        <%= service.title %>
+                                    </h5>
+                                    <p>
+                                        <%= service.description %>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <% }); %>
+                </div>
+                <div class="btn-box">
+                    <a href="/service">View More</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="client_section ">
+            <div class="container">
+                <div class="heading_container heading_center">
+                    <h2>What Our Clients Say</h2>
+                </div>
+                <div class="carousel-wrap layout_padding2-top ">
+                    <div class="owl-carousel">
+                        <% testimonials.forEach(testimonial=> { %>
+                            <div class="item">
+                                <div class="box">
+                                    <div class="client_id">
+                                        <div class="img-box">
+                                            <img src="<%= testimonial.img %>" alt="">
+                                        </div>
+                                        <div class="client_detail">
+                                            <div class="client_info">
+                                                <h6>
+                                                    <%= testimonial.name %>
+                                                </h6>
+                                                <% for(let i=0; i < 5; i++) { %>
+                                                    <i class="fa fa-star" aria-hidden="true"></i>
+                                                    <% } %>
+                                            </div>
+                                            <i class="fa fa-quote-left" aria-hidden="true"></i>
+                                        </div>
+                                    </div>
+                                    <div class="client_text">
+                                        <p>
+                                            <%= testimonial.text %>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <% }); %>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="contact_section layout_padding">
+            <div class="container">
+                <div class="heading_container">
+                    <h2>Contact Us</h2>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <form action="/contact" method="POST">
+                            <div><input type="text" name="name" placeholder="Name" /></div>
+                            <div><input type="text" name="phone" placeholder="Phone Number" /></div>
+                            <div><input type="email" name="email" placeholder="Email" /></div>
+                            <div><input type="text" name="message" class="message-box" placeholder="Message" /></div>
+                            <div class="d-flex "><button type="submit">SEND</button></div>
+                        </form>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="map_container">
+                            <div class="map">
+                                <div id="googleMap" style="width:100%;height:100%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <%- include('partials/info') %>
+            <%- include('partials/footer') %>
+</body>
+
+</html>

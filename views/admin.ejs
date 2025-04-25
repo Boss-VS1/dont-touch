@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="keywords" content="admin, dashboard, services, contact, management, bookings" />
+    <meta name="description" content="Advanced admin panel for service, contact, and booking management" />
+    <meta name="author" content="" />
+    <title>
+        <%= siteName %> - Admin Panel
+    </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css"
+        integrity="sha512-tS3S5qG0BlhnQROyJXvNjeEM4UpMXHrQfTGmbQ1gKmelCxlSEBUaxhRBj/EFTzpbP4RVSrpEikbmdJobCvhE3g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" />
+    <link href="/css/style.css" rel="stylesheet" />
+    <link href="/css/responsive.css" rel="stylesheet" />
+    <style>
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+            padding-top: 20px;
+        }
+
+        .sidebar {
+            width: 400px;
+            flex-shrink: 0;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-right: 1px solid #dee2e6;
+        }
+
+        .content-area {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        .accordion-button {
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            width: 100%;
+            text-align: left;
+            padding: 15px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .accordion-button:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .accordion-button.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .accordion-button i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        .accordion-content {
+            display: none;
+            padding: 15px;
+        }
+
+        .accordion-content.active {
+            display: block;
+        }
+
+        .service-form {
+            max-width: 100%;
+        }
+
+        .preview-img {
+            max-width: 100px;
+            max-height: 100px;
+            object-fit: cover;
+            display: none;
+        }
+
+        .search-container {
+            margin-bottom: 15px;
+        }
+
+        .status-message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .service-item,
+        .contact-item,
+        .booking-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .service-actions,
+        .contact-actions,
+        .booking-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #dee2e6;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('partials/header', { page: 'admin' }) %>
+        <div class="dashboard-container bg-light">
+            <div class="sidebar">
+                <h2 class="text-center mb-4 fw-bold text-primary">Admin Dashboard</h2>
+                <button class="accordion-button" data-target="create-service"><span><i class="fas fa-plus"></i> Create
+                        New Service</span></button>
+                <button class="accordion-button" data-target="service-management"><span><i class="fas fa-cogs"></i>
+                        Service Management</span></button>
+                <button class="accordion-button" data-target="bookings-management"><span><i
+                            class="fas fa-calendar-check"></i> Bookings Management</span></button>
+                <button class="accordion-button" data-target="contact-requests"><span><i class="fas fa-envelope"></i>
+                        Contact Requests</span></button>
+                <div class="text-center mt-4"><a href="/" class="btn btn-outline-primary w-100">Back to Home</a></div>
+            </div>
+            <div class="content-area">
+                <div id="statusMessage" class="status-message" style="display: none;"></div>
+                <div id="create-service" class="accordion-content card shadow-sm">
+                    <div class="card-body">
+                        <form id="addServiceForm" action="/admin/add-service" method="POST" class="service-form">
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Service Title</label>
+                                <input type="text" class="form-control" id="title" name="title"
+                                    placeholder="Enter service title" required minlength="3" maxlength="50" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="img" class="form-label">Image URL</label>
+                                <input type="url" class="form-control" id="img" name="img"
+                                    placeholder="e.g., /images/s4.png" required oninput="previewImage(this)" />
+                                <img id="imgPreview" class="preview-img mt-2 rounded" alt="Image preview" loading="lazy"
+                                    onerror="this.style.display='none'" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control message-box" id="description" name="description"
+                                    placeholder="Enter service description" required minlength="10"
+                                    maxlength="500"></textarea>
+                                <small class="form-text text-muted">Characters: <span
+                                        id="charCount">0</span>/500</small>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">Add Service</button>
+                        </form>
+                    </div>
+                </div>
+                <div id="service-management" class="accordion-content card shadow-sm">
+                    <div class="card-body">
+                        <div class="search-container">
+                            <input type="text" class="form-control" id="serviceSearch" placeholder="Search services..."
+                                aria-label="Search services" />
+                        </div>
+                        <% if (services.length===0) { %>
+                            <div class="text-center p-3 text-muted">No services available</div>
+                            <% } else { %>
+                                <ul class="service-list" id="serviceList">
+                                    <% services.forEach((service, index)=> { %>
+                                        <li class="service-item" data-title="<%= service.title.toLowerCase() %>"
+                                            data-description="<%= service.description.toLowerCase() %>">
+                                            <div>
+                                                <strong>
+                                                    <%= service.title %>
+                                                </strong>
+                                                <p class="mb-0 text-muted">
+                                                    <%= service.description %>
+                                                </p>
+                                                <small class="text-muted">Image: <%= service.img %></small>
+                                            </div>
+                                            <div class="service-actions">
+                                                <button class="btn btn-warning btn-sm edit-btn"
+                                                    data-index="<%= index %>" data-title="<%= service.title %>"
+                                                    data-img="<%= service.img %>"
+                                                    data-description="<%= service.description %>">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </button>
+                                                <form action="/admin/remove-service" method="POST" class="d-inline">
+                                                    <input type="hidden" name="index" value="<%= index %>" />
+                                                    <button type="submit" class="btn btn-danger btn-sm"
+                                                        onclick="return confirm(`Are you sure you want to remove '${service.title}'?`)">
+                                                        <i class="fas fa-trash"></i> Remove
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </li>
+                                        <% }); %>
+                                </ul>
+                                <% } %>
+                    </div>
+                </div>
+                <div id="bookings-management" class="accordion-content card shadow-sm">
+                    <div class="card-body">
+                        <div class="search-container">
+                            <input type="text" class="form-control" id="bookingSearch" placeholder="Search bookings..."
+                                aria-label="Search bookings" />
+                        </div>
+                        <% if (!bookings || bookings.length===0) { %>
+                            <div class="text-center p-3 text-muted">No bookings available</div>
+                            <% } else { %>
+                                <ul class="booking-list" id="bookingList">
+                                    <% bookings.forEach((booking, index)=> { %>
+                                        <li class="booking-item" data-user="<%= booking.userName.toLowerCase() %>"
+                                            data-service="<%= booking.serviceTitle.toLowerCase() %>"
+                                            data-status="<%= booking.status.toLowerCase() %>"
+                                            data-request="<%= booking.request ? booking.request.toLowerCase() : '' %>">
+                                            <div>
+                                                <strong>
+                                                    <%= booking.userName %>
+                                                </strong>
+                                                <p class="mb-0 text-muted">Service: <%= booking.serviceTitle %>
+                                                </p>
+                                                <p class="mb-0 text-muted">Status: <span
+                                                        class="badge bg-<%= booking.status === 'confirmed' ? 'success' : booking.status === 'pending' ? 'warning' : 'danger' %>">
+                                                        <%= booking.status %>
+                                                    </span></p>
+                                                <p class="mb-0 text-muted">Scheduled: <%= booking.bookingDate ? new
+                                                        Date(booking.bookingDate).toLocaleString() : 'Not specified' %>
+                                                </p>
+                                                <p class="mb-0 text-muted">Request: <%= booking.request || 'None' %>
+                                                </p>
+                                                <small class="timestamp">Booked: <%= new
+                                                        Date(booking.timestamp).toLocaleString() %></small>
+                                            </div>
+                                            <div class="booking-actions">
+                                                <button class="btn btn-primary btn-sm log-btn"
+                                                    data-booking='<%= JSON.stringify(booking) %>'>
+                                                    <i class="fas fa-terminal"></i> Log
+                                                </button>
+                                                <form action="/admin/remove-booking" method="POST" class="d-inline">
+                                                    <input type="hidden" name="index" value="<%= index %>" />
+                                                    <button type="submit" class="btn btn-danger btn-sm"
+                                                        onclick="return confirm(`Are you sure you want to remove this booking for '${booking.serviceTitle}' by '${booking.userName}'?`)">
+                                                        <i class="fas fa-trash"></i> Remove
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </li>
+                                        <% }); %>
+                                </ul>
+                                <% } %>
+                    </div>
+                </div>
+                <div id="contact-requests" class="accordion-content card shadow-sm">
+                    <div class="card-body">
+                        <div class="search-container">
+                            <input type="text" class="form-control" id="contactSearch"
+                                placeholder="Search contact requests..." aria-label="Search contact requests" />
+                        </div>
+                        <% if (!contacts || contacts.length===0) { %>
+                            <div class="text-center p-3 text-muted">No contact requests available</div>
+                            <% } else { %>
+                                <ul class="contact-list" id="contactList">
+                                    <% contacts.forEach((contact, index)=> { %>
+                                        <li class="contact-item" data-name="<%= contact.name.toLowerCase() %>"
+                                            data-email="<%= contact.email.toLowerCase() %>"
+                                            data-message="<%= contact.message.toLowerCase() %>">
+                                            <div>
+                                                <strong>
+                                                    <%= contact.name %>
+                                                </strong> (<%= contact.email %>)
+                                                    <p class="mb-0 text-muted">
+                                                        <%= contact.message %>
+                                                    </p>
+                                                    <small class="timestamp">Received: <%= new
+                                                            Date(contact.timestamp).toLocaleString() %></small>
+                                            </div>
+                                            <div class="contact-actions">
+                                                <button class="btn btn-primary btn-sm log-btn"
+                                                    data-contact='<%= JSON.stringify(contact) %>'>
+                                                    <i class="fas fa-terminal"></i> Log
+                                                </button>
+                                                <form action="/admin/remove-contact" method="POST" class="d-inline">
+                                                    <input type="hidden" name="index" value="<%= index %>" />
+                                                    <button type="submit" class="btn btn-danger btn-sm"
+                                                        onclick="return confirm(`Are you sure you want to remove this contact request from '${contact.name}'?`)">
+                                                        <i class="fas fa-trash"></i> Remove
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </li>
+                                        <% }); %>
+                                </ul>
+                                <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <%- include('partials/info') %>
+            <%- include('partials/footer') %>
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+                    integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+                    crossorigin="anonymous"></script>
+                <script>
+                    function previewImage(input) {
+                        const preview = document.getElementById('imgPreview');
+                        preview.src = input.value;
+                        preview.style.display = input.value && !preview.onerror ? 'block' : 'none';
+                    }
+                    const desc = document.getElementById('description');
+                    const charCount = document.getElementById('charCount');
+                    if (desc) {
+                        desc.addEventListener('input', () => charCount.textContent = desc.value.length);
+                    }
+                    const form = document.getElementById('addServiceForm');
+                    if (form) {
+                        form.addEventListener('submit', function (e) {
+                            e.preventDefault();
+                            if (this.checkValidity()) {
+                                showStatus('Service added successfully!', 'success');
+                                setTimeout(() => this.submit(), 1000);
+                            } else {
+                                this.reportValidity();
+                            }
+                        });
+                    }
+                    const accordionButtons = document.querySelectorAll('.accordion-button');
+                    accordionButtons.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const targetId = btn.dataset.target;
+                            const content = document.getElementById(targetId);
+                            const isActive = content.classList.contains('active');
+                            document.querySelectorAll('.accordion-content').forEach(el => el.classList.remove('active'));
+                            document.querySelectorAll('.accordion-button').forEach(el => el.classList.remove('active'));
+                            if (!isActive) {
+                                content.classList.add('active');
+                                btn.classList.add('active');
+                            }
+                        });
+                    });
+                    const searchHandler = (inputId, itemSelector, fields) => {
+                        const input = document.getElementById(inputId);
+                        const items = document.querySelectorAll(itemSelector);
+                        if (input) {
+                            input.addEventListener('input', () => {
+                                const query = input.value.toLowerCase();
+                                items.forEach(item => {
+                                    const matches = fields.some(field => (item.dataset[field] || '').includes(query));
+                                    item.style.display = matches ? '' : 'none';
+                                });
+                            });
+                        }
+                    };
+                    searchHandler('serviceSearch', '.service-item', ['title', 'description']);
+                    searchHandler('bookingSearch', '.booking-item', ['user', 'service', 'status', 'request']);
+                    searchHandler('contactSearch', '.contact-item', ['name', 'email', 'message']);
+                    const editButtons = document.querySelectorAll('.edit-btn');
+                    editButtons.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            document.getElementById('title').value = btn.dataset.title || '';
+                            document.getElementById('img').value = btn.dataset.img || '';
+                            document.getElementById('description').value = btn.dataset.description || '';
+                            charCount.textContent = btn.dataset.description ? btn.dataset.description.length : 0;
+                            previewImage(document.getElementById('img'));
+                            form.action = `/admin/edit-service/${btn.dataset.index}`;
+                            showStatus('Editing service. Submit to save changes.', 'info');
+                            document.getElementById('create-service').classList.add('active');
+                            document.querySelector('[data-target="create-service"]').classList.add('active');
+                        });
+                    });
+                    const logButtons = document.querySelectorAll('.log-btn');
+                    logButtons.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            try {
+                                if (btn.dataset.contact) {
+                                    const contact = JSON.parse(btn.dataset.contact);
+                                    console.log('Contact Request:', contact);
+                                    showStatus(`Logged contact from ${contact.name} to console`, 'info');
+                                } else if (btn.dataset.booking) {
+                                    const booking = JSON.parse(btn.dataset.booking);
+                                    console.log('Booking Details:', booking);
+                                    showStatus(`Logged booking from ${booking.userName} to console`, 'info');
+                                }
+                            } catch (e) {
+                                console.error('Error parsing data:', e);
+                                showStatus('Error logging data', 'danger');
+                            }
+                        });
+                    });
+                    function showStatus(message, type) {
+                        const status = document.getElementById('statusMessage');
+                        if (status) {
+                            status.textContent = message;
+                            status.className = `status-message alert alert-${type}`;
+                            status.style.display = 'block';
+                            setTimeout(() => status.style.display = 'none', 3000);
+                        }
+                    }
+                </script>
+</body>
+
+</html>
